@@ -1,27 +1,46 @@
 <template>
   <div class="home">
-    <p ref="pRef">My name is {{ name }} and my age is {{ age }}</p>
-    <button @click="handleClick">Click me :)</button>
+    <h1>Home</h1>
+    <input type="text" v-model="search" />
+    <p>Search term - {{ search }}</p>
+    <div v-for="name in matchingNames" :key="name">
+      {{ name }}
+    </div>
   </div>
 </template>
 
 <script>
-import { ref } from "@vue/reactivity";
+import { ref, computed } from "@vue/reactivity";
+import { watch, watchEffect } from "@vue/runtime-core";
 export default {
   name: "HomeView",
 
   setup() {
-    const pRef = ref(null);
+    const search = ref("");
 
-    let name = "mario";
-    let age = 30;
+    const names = ref([
+      "mario",
+      "yoshi",
+      "luigi",
+      "toad",
+      "bowser",
+      "koopa",
+      "peach",
+    ]);
 
-    const handleClick = () => {
-      console.log(pRef, pRef.value);
-      pRef.value.classList.add("test");
-    };
+    watch(search, () => {
+      console.log("watch function fired");
+    });
 
-    return { name, age, handleClick, pRef };
+    watchEffect(() => {
+      console.log("watch effect function fired");
+    });
+
+    const matchingNames = computed(() => {
+      return names.value.filter((name) => name.includes(search.value));
+    });
+
+    return { names, search, matchingNames };
   },
 };
 </script>
