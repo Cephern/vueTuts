@@ -1,46 +1,38 @@
 <template>
   <div class="home">
     <h1>Home</h1>
-    <input type="text" v-model="search" />
-    <p>Search term - {{ search }}</p>
-    <div v-for="name in matchingNames" :key="name">
-      {{ name }}
-    </div>
+
+    <main v-if="posts.length">
+      <PostList :posts="posts" v-if="showPosts" />
+
+      <button @click="showPosts = !showPosts">Toggle posts</button>
+
+      <button @click="posts.pop()">Delete a post</button>
+    </main>
+    <div v-else-if="!error">Loading...</div>
+
+    <p v-if="error">{{ error }}</p>
   </div>
 </template>
 
 <script>
-import { ref, computed } from "@vue/reactivity";
-import { watch, watchEffect } from "@vue/runtime-core";
+import { ref } from "@vue/reactivity";
+import PostList from "../components/PostList.vue";
+import getPosts from "../composables/getPosts.js";
+
 export default {
   name: "HomeView",
 
+  components: { PostList },
+
   setup() {
-    const search = ref("");
+    const { posts, error, load } = getPosts();
 
-    const names = ref([
-      "mario",
-      "yoshi",
-      "luigi",
-      "toad",
-      "bowser",
-      "koopa",
-      "peach",
-    ]);
+    setTimeout(load, 1000);
 
-    watch(search, () => {
-      console.log("watch function fired");
-    });
+    const showPosts = ref(true);
 
-    watchEffect(() => {
-      console.log("watch effect function fired");
-    });
-
-    const matchingNames = computed(() => {
-      return names.value.filter((name) => name.includes(search.value));
-    });
-
-    return { names, search, matchingNames };
+    return { posts, showPosts, error };
   },
 };
 </script>
